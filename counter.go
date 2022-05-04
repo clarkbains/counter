@@ -41,11 +41,10 @@ func (c *Counter) AddOneWithContext(ctx context.Context) error {
 	channel := make(chan addRes)
 	
 	go func (ctx context.Context)  {
-		time.Sleep(c.timeout)
 		select {
 		case <- ctx.Done():
 			channel <- addRes{}
-		default:
+		case <- time.After(c.timeout):
 			c.AddOne()
 			channel <- addRes{finished: true, newValue: c.value}
 		}
